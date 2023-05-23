@@ -4,42 +4,33 @@ using UnityEngine;
 
 public class PlayerMovement : MonoBehaviour
 {
-    public float movementSpeed = 5.0f;
+    public float moveSpeed = 5f;
+
     public Rigidbody2D rb;
-    private Vector2 moveInput;
+    public Camera cam;
 
-    public float dashSpeed = 10f;
-    public float dashDuration = 1f;
-    public float dashCooldown = 1f;
-    bool isDashing;
-    void Start()
-    {
-       
-    }
+    Vector2 movement;
+    Vector2 mousePos;
 
+    // Update is called once per frame
     void Update()
     {
-        if (isDashing)
-            return;
+        movement.x = Input.GetAxisRaw("Horizontal");
+        movement.y = Input.GetAxisRaw("Vertical");
 
-        moveInput.x = Input.GetAxisRaw("Horizontal");
-        moveInput.y = Input.GetAxisRaw("Vertical");
-
-        moveInput.Normalize();
-
-        rb.velocity = moveInput * movementSpeed;
-
-        if(Input.GetKeyDown(KeyCode.Space))
-        {
-            StartCoroutine(Dash());
-        }
+        LookAtMouse();
     }
 
-    private IEnumerator Dash()
+    private void FixedUpdate()
     {
-        isDashing = true;
-        rb.velocity = new Vector2(moveInput.x * dashSpeed, moveInput.y * dashSpeed);
-        yield return new WaitForSeconds(dashDuration);
-        isDashing = false;
+        rb.MovePosition(rb.position + movement * moveSpeed * Time.fixedDeltaTime);
+
     }
+
+    void LookAtMouse()
+    {
+        Vector2 mousePos = (Vector2)Camera.main.ScreenToWorldPoint(Input.mousePosition);
+        transform.up = mousePos - new Vector2(transform.position.x, transform.position.y);
+    }
+
 }
